@@ -1,0 +1,17 @@
+name: Keep Wake
+
+on:
+  schedule:
+    # Every 8 minutes, GitHub Actions min cadence is ~5 min
+    - cron: "*/8 * * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Wasmer backend health
+        run: |
+          CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 https://degoony-fleet-backend.wasmer.app/health)
+          echo "Health returned: $CODE"
+          if [ "$CODE" != "200" ]; then exit 1; fi
